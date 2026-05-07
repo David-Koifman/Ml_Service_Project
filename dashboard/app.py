@@ -269,6 +269,11 @@ hr { border-color: #e5e7eb; }
 
 
 # ── helpers ──────────────────────────────────────────────
+def fmt_model(name: str) -> str:
+    """Make model file names human-readable."""
+    return name.replace("_", " ").replace("-", " ").title()
+
+
 def api(method, path, token=None, **kwargs):
     headers = {"Authorization": f"Bearer {token}"} if token else {}
     try:
@@ -306,10 +311,109 @@ def restore_session():
                 st.session_state["_restored_page"] = st.query_params["page"]
 
 
+# ── landing page ─────────────────────────────────────────
+def page_landing():
+    st.markdown("""
+    <style>
+    .stApp { background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%) !important; }
+    .block-container { padding-top: 0 !important; max-width: 860px; }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style="text-align:center;padding:72px 0 48px">
+        <div style="display:inline-flex;align-items:center;justify-content:center;
+                    width:72px;height:72px;border-radius:20px;margin-bottom:24px;
+                    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+                    font-size:34px;font-weight:800;color:white;
+                    box-shadow:0 8px 32px rgba(99,102,241,0.5)">M</div>
+        <h1 style="color:white;font-size:3rem;font-weight:800;margin:0;line-height:1.1">
+            ML Loan Service
+        </h1>
+        <p style="color:rgba(255,255,255,0.6);font-size:1.1rem;margin:16px 0 0">
+            Скоринг кредитных заявок на основе машинного обучения.<br>
+            Результат за секунды — точность модели <strong style="color:#a5b4fc">93%</strong>.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    f1, f2, f3 = st.columns(3)
+    features = [
+        ("93%", "Точность модели", "GradientBoosting на 58k реальных заявок", "#6366f1"),
+        ("<2 сек", "Время ответа", "Асинхронная обработка через Celery + Redis", "#8b5cf6"),
+        ("10 кр.", "Цена запроса", "Платите только за результат, без подписки", "#06b6d4"),
+    ]
+    for col, (val, title, desc, color) in zip([f1, f2, f3], features):
+        col.markdown(f"""
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+                    border-radius:16px;padding:24px;text-align:center;
+                    transition:transform 0.2s">
+            <div style="font-size:2rem;font-weight:800;color:{color}">{val}</div>
+            <div style="font-weight:600;color:white;margin:8px 0 6px;font-size:15px">{title}</div>
+            <div style="color:rgba(255,255,255,0.5);font-size:13px;line-height:1.4">{desc}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<div style='height:48px'></div>", unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+                border-radius:16px;padding:28px 32px;margin-bottom:32px">
+        <div style="font-weight:700;color:white;font-size:15px;margin-bottom:16px">
+            Как это работает
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
+            <div style="text-align:center">
+                <div style="width:36px;height:36px;border-radius:50%;background:#6366f1;
+                            color:white;font-weight:700;display:flex;align-items:center;
+                            justify-content:center;margin:0 auto 8px;font-size:14px">1</div>
+                <div style="color:rgba(255,255,255,0.7);font-size:13px">Регистрация и<br>получение 100 кредитов</div>
+            </div>
+            <div style="text-align:center">
+                <div style="width:36px;height:36px;border-radius:50%;background:#7c3aed;
+                            color:white;font-weight:700;display:flex;align-items:center;
+                            justify-content:center;margin:0 auto 8px;font-size:14px">2</div>
+                <div style="color:rgba(255,255,255,0.7);font-size:13px">Вводите данные<br>заёмщика</div>
+            </div>
+            <div style="text-align:center">
+                <div style="width:36px;height:36px;border-radius:50%;background:#8b5cf6;
+                            color:white;font-weight:700;display:flex;align-items:center;
+                            justify-content:center;margin:0 auto 8px;font-size:14px">3</div>
+                <div style="color:rgba(255,255,255,0.7);font-size:13px">ML-модель<br>анализирует заявку</div>
+            </div>
+            <div style="text-align:center">
+                <div style="width:36px;height:36px;border-radius:50%;background:#06b6d4;
+                            color:white;font-weight:700;display:flex;align-items:center;
+                            justify-content:center;margin:0 auto 8px;font-size:14px">4</div>
+                <div style="color:rgba(255,255,255,0.7);font-size:13px">Решение:<br>одобрено / отказано</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    bc1, bc2, bc3, bc4 = st.columns([1.2, 1, 1, 1.2])
+    with bc2:
+        if st.button("Войти", use_container_width=True):
+            st.query_params["action"] = "login"
+            st.rerun()
+    with bc3:
+        if st.button("Регистрация", use_container_width=True, type="primary"):
+            st.query_params["action"] = "login"
+            st.rerun()
+    st.markdown("""
+    <p style="text-align:center;color:rgba(255,255,255,0.35);font-size:12px;margin-top:12px">
+        При регистрации — 100 бесплатных кредитов
+    </p>
+    """, unsafe_allow_html=True)
+
+
 # ── auth pages ────────────────────────────────────────────
 def page_auth():
     col = st.columns([1, 1.2, 1])[1]
     with col:
+        if st.button("← На главную"):
+            st.query_params.clear()
+            st.rerun()
         st.markdown("""
         <div style="text-align:center;padding:40px 0 28px">
             <div style="display:inline-flex;align-items:center;justify-content:center;
@@ -492,9 +596,9 @@ def page_prediction():
             st.warning("Нет доступных моделей. Обратитесь к администратору.")
             return
 
-        model_names = {m["name"]: m["id"] for m in models}
-        selected = st.selectbox("Модель", list(model_names.keys()))
-        model_id = model_names[selected]
+        model_options = {fmt_model(m["name"]): m["id"] for m in models}
+        selected = st.selectbox("Модель скоринга", list(model_options.keys()))
+        model_id = model_options[selected]
 
         st.markdown("**Данные заёмщика**")
         c1, c2 = st.columns(2)
@@ -502,17 +606,26 @@ def page_prediction():
             age     = st.number_input("Возраст", 18, 100, 30)
             gender  = st.selectbox("Пол", ["male", "female"])
             edu     = st.selectbox("Образование", ["High School", "Associate", "Bachelor", "Master", "Doctorate"])
-            income  = st.number_input("Доход (год, $)", 0, 10_000_000, 60000, step=1000)
+            income  = st.number_input("Доход в год ($)", 0, 10_000_000, 60000, step=1000)
             emp_exp = st.number_input("Опыт работы (лет)", 0, 50, 5)
             home    = st.selectbox("Жильё", ["RENT", "OWN", "MORTGAGE", "OTHER"])
         with c2:
             loan_amnt    = st.number_input("Сумма займа ($)", 0, 1_000_000, 10000, step=500)
             loan_intent  = st.selectbox("Цель займа", ["PERSONAL", "EDUCATION", "MEDICAL", "VENTURE", "HOMEIMPROVEMENT", "DEBTCONSOLIDATION"])
             loan_rate    = st.number_input("Процентная ставка (%)", 0.0, 50.0, 10.5)
-            loan_pct_inc = st.number_input("Доля займа от дохода", 0.0, 1.0, 0.17, step=0.01)
             cred_hist    = st.number_input("История кредитов (лет)", 0, 50, 3)
             credit_score = st.number_input("Кредитный рейтинг", 300, 850, 650)
             prev_default = st.selectbox("Прошлые дефолты", ["No", "Yes"])
+
+        # авто-расчёт доли займа от дохода
+        loan_pct_inc = round(loan_amnt / income, 4) if income > 0 else 0.0
+        st.markdown(f"""
+        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;
+                    padding:10px 14px;margin:4px 0 12px;font-size:13px;color:#0369a1">
+            Доля займа от дохода: <strong>{loan_pct_inc:.2%}</strong>
+            &nbsp;(рассчитано автоматически: {loan_amnt:,}$ / {income:,}$)
+        </div>
+        """, unsafe_allow_html=True)
 
         if st.button("Отправить на оценку", use_container_width=True, type="primary"):
             payload = {
@@ -896,7 +1009,10 @@ def page_users():
 restore_session()
 
 if "token" not in st.session_state:
-    page_auth()
+    if st.query_params.get("action") == "login":
+        page_auth()
+    else:
+        page_landing()
 else:
     page = sidebar()
     st.query_params["page"] = page
