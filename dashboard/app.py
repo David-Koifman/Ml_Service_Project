@@ -394,11 +394,13 @@ def page_landing():
     bc1, bc2, bc3, bc4 = st.columns([1.2, 1, 1, 1.2])
     with bc2:
         if st.button("Войти", use_container_width=True):
-            st.query_params["action"] = "login"
+            st.session_state.show_auth = True
+            st.session_state.auth_tab  = "login"
             st.rerun()
     with bc3:
         if st.button("Регистрация", use_container_width=True, type="primary"):
-            st.query_params["action"] = "login"
+            st.session_state.show_auth = True
+            st.session_state.auth_tab  = "register"
             st.rerun()
     st.markdown("""
     <p style="text-align:center;color:rgba(255,255,255,0.35);font-size:12px;margin-top:12px">
@@ -409,13 +411,18 @@ def page_landing():
 
 # ── auth pages ────────────────────────────────────────────
 def page_auth():
+    if "auth_tab" not in st.session_state:
+        st.session_state.auth_tab = "login"
+
     col = st.columns([1, 1.2, 1])[1]
     with col:
         if st.button("← На главную"):
-            st.query_params.clear()
+            st.session_state.pop("show_auth", None)
+            st.session_state.pop("auth_tab", None)
             st.rerun()
+
         st.markdown("""
-        <div style="text-align:center;padding:40px 0 28px">
+        <div style="text-align:center;padding:32px 0 24px">
             <div style="display:inline-flex;align-items:center;justify-content:center;
                         width:56px;height:56px;border-radius:16px;margin-bottom:16px;
                         background:linear-gradient(135deg,#6366f1,#8b5cf6);
@@ -424,12 +431,25 @@ def page_auth():
             <p style="color:#6b7280;margin:8px 0 0;font-size:14px">Платформа предсказания кредитных заявок</p>
         </div>
         """, unsafe_allow_html=True)
-        tab_login, tab_reg = st.tabs(["Войти", "Регистрация"])
 
-        with tab_login:
+        # custom tab switcher
+        t1, t2 = st.columns(2)
+        active = st.session_state.auth_tab
+        t1_type = "primary" if active == "login"    else "secondary"
+        t2_type = "primary" if active == "register" else "secondary"
+        if t1.button("Войти",          use_container_width=True, type=t1_type, key="tab_btn_login"):
+            st.session_state.auth_tab = "login"
+            st.rerun()
+        if t2.button("Регистрация",    use_container_width=True, type=t2_type, key="tab_btn_reg"):
+            st.session_state.auth_tab = "register"
+            st.rerun()
+
+        st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+        if st.session_state.auth_tab == "login":
             email = st.text_input("Email", key="li_email")
             pwd   = st.text_input("Пароль", type="password", key="li_pwd")
-            if st.button("Войти", use_container_width=True):
+            if st.button("Войти", use_container_width=True, type="primary", key="do_login"):
                 r = api("post", "/auth/login", data={"username": email, "password": pwd})
                 if r and r.status_code == 200:
                     token = r.json()["access_token"]
@@ -439,15 +459,15 @@ def page_auth():
                         st.session_state.token = token
                         st.session_state.user  = u["email"]
                         st.session_state.role  = u["role"]
+                        st.query_params.clear()
                         st.query_params["token"] = token
                         st.rerun()
                 else:
                     st.error("Неверный email или пароль")
-
-        with tab_reg:
+        else:
             r_email = st.text_input("Email", key="reg_email")
             r_pwd   = st.text_input("Пароль (мин. 6 символов)", type="password", key="reg_pwd")
-            if st.button("Зарегистрироваться", use_container_width=True, type="primary"):
+            if st.button("Зарегистрироваться", use_container_width=True, type="primary", key="do_reg"):
                 if not r_email or not r_pwd:
                     st.error("Заполните все поля")
                 elif len(r_pwd) < 6:
@@ -455,7 +475,8 @@ def page_auth():
                 else:
                     r = api("post", "/auth/register", json={"email": r_email, "password": r_pwd})
                     if r and r.status_code == 201:
-                        st.success("Аккаунт создан! Перейдите на вкладку «Войти»")
+                        st.success("Аккаунт создан! Нажмите «Войти»")
+                        st.session_state.auth_tab = "login"
                     elif r:
                         detail = r.json().get("detail", "Ошибка")
                         if "already" in str(detail):
@@ -1009,7 +1030,7 @@ def page_users():
 restore_session()
 
 if "token" not in st.session_state:
-    if st.query_params.get("action") == "login":
+    if st.session_state.get("show_auth"):
         page_auth()
     else:
         page_landing()
