@@ -1,0 +1,144 @@
+{
+  "title": "ML Loan Service",
+  "uid": "ml-loan-service",
+  "timezone": "browser",
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Предсказаний всего (успешных)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "options": {"colorMode": "background"},
+      "targets": [{
+        "expr": "sum(ml_predictions_total{status=\"done\"}) or vector(0)",
+        "legendFormat": "Done"
+      }],
+      "fieldConfig": {"defaults": {"color": {"fixedColor": "green", "mode": "fixed"}}},
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 2,
+      "title": "Предсказаний с ошибкой",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 0},
+      "options": {"colorMode": "background"},
+      "targets": [{
+        "expr": "sum(ml_predictions_total{status=\"failed\"}) or vector(0)",
+        "legendFormat": "Failed"
+      }],
+      "fieldConfig": {"defaults": {"color": {"fixedColor": "red", "mode": "fixed"}}},
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 3,
+      "title": "Кредитов списано всего",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 0},
+      "options": {"colorMode": "background"},
+      "targets": [{
+        "expr": "ml_credits_spent_total or vector(0)",
+        "legendFormat": "Credits"
+      }],
+      "fieldConfig": {"defaults": {"color": {"fixedColor": "orange", "mode": "fixed"}}},
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 4,
+      "title": "Среднее время предсказания (сек)",
+      "type": "stat",
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0},
+      "targets": [{
+        "expr": "rate(ml_prediction_duration_seconds_sum[5m]) / rate(ml_prediction_duration_seconds_count[5m])",
+        "legendFormat": "avg duration"
+      }],
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 5,
+      "title": "Предсказания в минуту",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "targets": [
+        {
+          "expr": "rate(ml_predictions_total{status=\"done\"}[1m]) * 60",
+          "legendFormat": "Успешные"
+        },
+        {
+          "expr": "rate(ml_predictions_total{status=\"failed\"}[1m]) * 60",
+          "legendFormat": "Ошибки"
+        }
+      ],
+      "fieldConfig": {"defaults": {"custom": {"lineWidth": 2}}},
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 6,
+      "title": "Кредитов списано в минуту",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "targets": [{
+        "expr": "rate(ml_credits_spent_total[1m]) * 60",
+        "legendFormat": "Кредиты/мин"
+      }],
+      "fieldConfig": {"defaults": {"color": {"fixedColor": "orange", "mode": "fixed"}, "custom": {"lineWidth": 2}}},
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 7,
+      "title": "Время обработки предсказания (p50 / p95)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(ml_prediction_duration_seconds_bucket[5m]))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(ml_prediction_duration_seconds_bucket[5m]))",
+          "legendFormat": "p95"
+        }
+      ],
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 8,
+      "title": "HTTP запросы к API (req/s)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "targets": [{
+        "expr": "rate(http_requests_total{job=\"ml_service_api\"}[1m])",
+        "legendFormat": "{{method}} {{handler}} {{status}}"
+      }],
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 9,
+      "title": "Ошибки HTTP (4xx + 5xx)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+      "targets": [{
+        "expr": "rate(http_requests_total{job=\"ml_service_api\", status=~\"4..|5..\"}[1m])",
+        "legendFormat": "{{status}} {{handler}}"
+      }],
+      "fieldConfig": {"defaults": {"color": {"fixedColor": "red", "mode": "fixed"}}},
+      "datasource": "Prometheus"
+    },
+    {
+      "id": 10,
+      "title": "Латентность API p95 (сек)",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "targets": [{
+        "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"ml_service_api\"}[5m]))",
+        "legendFormat": "p95 {{handler}}"
+      }],
+      "fieldConfig": {"defaults": {"unit": "s"}},
+      "datasource": "Prometheus"
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 2
+}
