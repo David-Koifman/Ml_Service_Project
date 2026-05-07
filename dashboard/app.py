@@ -14,17 +14,255 @@ st.set_page_config(page_title="ML Loan Service", layout="wide", initial_sidebar_
 
 st.markdown("""
 <style>
-[data-testid="stSidebar"] { background: #1a1a2e; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* { font-family: 'Inter', sans-serif; }
+
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
 [data-testid="stSidebar"] label,
 [data-testid="stSidebar"] p,
-[data-testid="stSidebar"] span { color: #e0e0e0 !important; }
-[data-testid="stSidebar"] .stRadio > div { gap: 4px; }
-.stTabs [data-baseweb="tab"] { font-size: 15px; }
+[data-testid="stSidebar"] span,
+[data-testid="stSidebar"] div { color: #e0e0e0 !important; }
+[data-testid="stSidebar"] .stRadio > div { gap: 2px; }
+[data-testid="stSidebar"] .stRadio label {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+[data-testid="stSidebar"] .stRadio label:hover {
+    background: rgba(99,102,241,0.25);
+    border-color: rgba(99,102,241,0.4);
+}
+[data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.1); }
+[data-testid="stSidebar"] .stMetric { background: rgba(255,255,255,0.07); border-radius: 10px; padding: 8px 12px; }
+[data-testid="stSidebar"] .stMetric label { font-size: 11px !important; opacity: 0.7; }
+[data-testid="stSidebar"] .stMetric [data-testid="metric-container"] { background: transparent !important; border: none !important; padding: 0 !important; }
+
+/* ── Main background ── */
+.stApp { background: #f0f2f6; }
+.block-container { padding-top: 1.5rem; }
+
+/* ── Metric cards ── */
 div[data-testid="metric-container"] {
-    background: #f8f9fa;
+    background: white;
+    border-radius: 12px;
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-top: 3px solid #6366f1;
+}
+div[data-testid="metric-container"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99,102,241,0.15);
+}
+div[data-testid="metric-container"] label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+div[data-testid="metric-container"] [data-testid="metric-value"] {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* ── Page titles ── */
+h1 { color: #4f46e5; font-weight: 700; font-size: 2rem; margin-bottom: 0.5rem; }
+h2, h3 { color: #1f2937; font-weight: 600; }
+
+/* ── Tabs ── */
+.stTabs [data-baseweb="tab-list"] {
+    background: white;
+    border-radius: 12px;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+    gap: 4px;
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    color: white !important;
+}
+
+/* ── Buttons ── */
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
     border-radius: 10px;
-    padding: 16px;
-    border-left: 4px solid #4361ee;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+}
+.stButton > button[kind="primary"]:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99,102,241,0.45);
+}
+.stButton > button[kind="secondary"] {
+    border-radius: 8px;
+    border-color: #d1d5db;
+    color: #374151;
+    transition: all 0.15s;
+}
+
+/* ── Inputs ── */
+.stTextInput input, .stNumberInput input,
+.stTextInput > div > div > input,
+.stPasswordInput input {
+    background: white !important;
+    border: 1.5px solid #d1d5db !important;
+    border-radius: 10px !important;
+    padding: 10px 14px !important;
+    font-size: 15px !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+.stTextInput input:focus, .stNumberInput input:focus,
+.stTextInput > div > div > input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15) !important;
+}
+
+/* ── Tabs — fix active state ── */
+.stTabs [data-baseweb="tab-list"] {
+    background: white;
+    border-radius: 12px;
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+    gap: 4px;
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px !important;
+    font-size: 15px;
+    font-weight: 500;
+    color: #6b7280 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 8px 20px !important;
+}
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    color: white !important;
+}
+.stTabs [data-baseweb="tab-highlight"] { display: none !important; }
+.stTabs [data-baseweb="tab-border"] { display: none !important; }
+
+/* ── Containers / Cards ── */
+div[data-testid="stVerticalBlock"] > div[data-testid="stVerticalBlock"] > [data-testid="element-container"] > div[data-baseweb="notification"],
+.stAlert {
+    border-radius: 10px;
+}
+[data-testid="stExpander"],
+[data-testid="stForm"] {
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+/* ── DataTable ── */
+[data-testid="stDataFrame"] {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* ── Divider ── */
+hr { border-color: #e5e7eb; }
+
+/* ── Auth page card ── */
+.auth-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border: 1px solid #e5e7eb;
+}
+.auth-logo {
+    text-align: center;
+    margin-bottom: 24px;
+}
+.auth-logo h2 {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+}
+.auth-logo p { color: #6b7280; margin: 4px 0 0; font-size: 14px; }
+
+/* ── Result card ── */
+.result-approved {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    border: 2px solid #10b981;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+.result-rejected {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border: 2px solid #ef4444;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    animation: fadeIn 0.5s ease;
+}
+.result-title { font-size: 1.5rem; font-weight: 800; margin: 0; }
+.result-approved .result-title { color: #065f46; }
+.result-rejected .result-title { color: #991b1b; }
+
+/* ── Stat badge ── */
+.stat-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.badge-done   { background: #d1fae5; color: #065f46; }
+.badge-failed { background: #fee2e2; color: #991b1b; }
+.badge-pending { background: #fef3c7; color: #92400e; }
+
+/* ── Sidebar brand ── */
+.sidebar-brand {
+    text-align: center;
+    padding: 16px 0 8px;
+}
+.sidebar-brand h3 {
+    color: #a5b4fc !important;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+}
+.sidebar-brand p {
+    color: rgba(255,255,255,0.55) !important;
+    font-size: 12px;
+    margin: 4px 0 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+    50%       { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -72,9 +310,16 @@ def restore_session():
 def page_auth():
     col = st.columns([1, 1.2, 1])[1]
     with col:
-        st.markdown("## ML Loan Service")
-        st.markdown("Платформа предсказания кредитных заявок")
-        st.divider()
+        st.markdown("""
+        <div style="text-align:center;padding:40px 0 28px">
+            <div style="display:inline-flex;align-items:center;justify-content:center;
+                        width:56px;height:56px;border-radius:16px;margin-bottom:16px;
+                        background:linear-gradient(135deg,#6366f1,#8b5cf6);
+                        font-size:26px;color:white;font-weight:800">M</div>
+            <div style="font-size:1.9rem;font-weight:800;color:#1f2937;line-height:1.1">ML Loan Service</div>
+            <p style="color:#6b7280;margin:8px 0 0;font-size:14px">Платформа предсказания кредитных заявок</p>
+        </div>
+        """, unsafe_allow_html=True)
         tab_login, tab_reg = st.tabs(["Войти", "Регистрация"])
 
         with tab_login:
@@ -98,7 +343,7 @@ def page_auth():
         with tab_reg:
             r_email = st.text_input("Email", key="reg_email")
             r_pwd   = st.text_input("Пароль (мин. 6 символов)", type="password", key="reg_pwd")
-            if st.button("Зарегистрироваться", use_container_width=True):
+            if st.button("Зарегистрироваться", use_container_width=True, type="primary"):
                 if not r_email or not r_pwd:
                     st.error("Заполните все поля")
                 elif len(r_pwd) < 6:
@@ -121,11 +366,20 @@ def sidebar():
     role  = st.session_state.role
 
     with st.sidebar:
-        st.markdown(f"### ML Loan Service")
-        st.caption(f"Вы: {st.session_state.user}")
+        st.markdown(f"""
+        <div class="sidebar-brand">
+            <h3>ML Loan Service</h3>
+            <p>{st.session_state.user}</p>
+        </div>
+        """, unsafe_allow_html=True)
         bal = api("get", "/billing/balance", token=token)
-        if bal and bal.status_code == 200:
-            st.metric("Баланс", f"{bal.json()['credits_balance']} кр.")
+        credits = bal.json()["credits_balance"] if bal and bal.status_code == 200 else "—"
+        st.markdown(f"""
+        <div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;margin:8px 0">
+            <div style="font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;font-weight:600">Баланс</div>
+            <div style="font-size:1.4rem;font-weight:700;color:#a5b4fc;margin-top:2px">{credits} <span style="font-size:13px;opacity:0.8">кр.</span></div>
+        </div>
+        """, unsafe_allow_html=True)
         st.divider()
 
         user_pages = ["Профиль", "Предсказание", "Мои предсказания", "Биллинг"]
@@ -157,11 +411,37 @@ def page_profile():
 
     with col1:
         st.subheader("Профиль")
-        with st.container(border=True):
-            st.markdown(f"**Email:** {u['email']}")
-            st.markdown(f"**Роль:** {'Администратор' if u['role'] == 'admin' else 'Пользователь'}")
-            st.markdown(f"**Дата регистрации:** {u['created_at'][:10]}")
-            st.markdown(f"**Баланс:** {u['credits_balance']} кредитов")
+        role_label = "Администратор" if u["role"] == "admin" else "Пользователь"
+        role_color = "#7c3aed" if u["role"] == "admin" else "#2563eb"
+        initials = u["email"][0].upper()
+        st.markdown(f"""
+        <div style="background:white;border-radius:16px;padding:24px;border:1px solid #e5e7eb;
+                    box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+                <div style="width:52px;height:52px;border-radius:50%;
+                            background:linear-gradient(135deg,#6366f1,#8b5cf6);
+                            display:flex;align-items:center;justify-content:center;
+                            font-size:22px;font-weight:700;color:white">{initials}</div>
+                <div>
+                    <div style="font-weight:700;font-size:16px;color:#111827">{u['email']}</div>
+                    <span style="background:{role_color}20;color:{role_color};
+                                 padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600">
+                        {role_label}
+                    </span>
+                </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="background:#f9fafb;border-radius:10px;padding:12px">
+                    <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Регистрация</div>
+                    <div style="font-weight:600;color:#111827;margin-top:2px">{u['created_at'][:10]}</div>
+                </div>
+                <div style="background:#f0fdf4;border-radius:10px;padding:12px">
+                    <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:0.05em;font-weight:600">Баланс</div>
+                    <div style="font-weight:700;color:#059669;margin-top:2px">{u['credits_balance']} кр.</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
     with col2:
         st.subheader("Моя статистика")
@@ -260,12 +540,18 @@ def page_prediction():
 
         if last_result:
             res = last_result["result"]
-            if res["approved"]:
-                st.success("ОДОБРЕНО")
-            else:
-                st.error("ОТКАЗАНО")
-            st.metric("Вероятность", f"{res['probability'] * 100:.1f}%")
-            st.metric("Списано кредитов", last_result["credits_cost"])
+            card_cls = "result-approved" if res["approved"] else "result-rejected"
+            icon = "✓" if res["approved"] else "✗"
+            verdict = "ОДОБРЕНО" if res["approved"] else "ОТКАЗАНО"
+            st.markdown(f"""
+            <div class="{card_cls}">
+                <p class="result-title">{icon} {verdict}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+            mc1, mc2 = st.columns(2)
+            mc1.metric("Вероятность", f"{res['probability'] * 100:.1f}%")
+            mc2.metric("Списано кредитов", last_result["credits_cost"])
 
         elif task_id:
             with st.spinner("Обрабатываем..."):
@@ -284,7 +570,15 @@ def page_prediction():
                     st.error(f"Ошибка: {task.get('result', {}).get('error', 'неизвестно')}")
                     st.session_state.pop("last_task_id", None)
         else:
-            st.info("Заполните форму слева и нажмите «Отправить»")
+            st.markdown("""
+            <div style="background:white;border-radius:16px;padding:32px;text-align:center;
+                        border:2px dashed #d1d5db;color:#9ca3af;margin-top:16px">
+                <p style="font-size:2rem;margin:0">&#128203;</p>
+                <p style="font-weight:600;font-size:14px;margin:8px 0 0">
+                    Заполните форму и нажмите «Отправить на оценку»
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
 
 
 # ── страница: мои предсказания ────────────────────────────
@@ -338,7 +632,16 @@ def page_billing():
 
     with col1:
         st.subheader("Баланс")
-        st.metric("Текущий баланс", f"{balance} кредитов")
+        st.markdown(f"""
+        <div style="background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%);
+                    border-radius:16px;padding:24px;margin-bottom:16px;color:white">
+            <div style="font-size:12px;font-weight:600;opacity:0.8;text-transform:uppercase;letter-spacing:0.05em">
+                Текущий баланс
+            </div>
+            <div style="font-size:2.5rem;font-weight:800;margin-top:4px">{balance}</div>
+            <div style="font-size:14px;opacity:0.7;margin-top:2px">кредитов</div>
+        </div>
+        """, unsafe_allow_html=True)
         st.divider()
 
         st.subheader("Пополнить баланс")
@@ -357,7 +660,13 @@ def page_billing():
             amount = PACKAGES[choice]
             price  = {100: 50, 500: 200, 1000: 350}[amount]
 
-        st.caption(f"К оплате: **{price:.0f} ₽**")
+        st.markdown(f"""
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;
+                    padding:12px 16px;margin:8px 0;display:flex;justify-content:space-between;align-items:center">
+            <span style="color:#374151;font-size:14px">К оплате:</span>
+            <span style="color:#059669;font-weight:800;font-size:18px">{price:.0f} ₽</span>
+        </div>
+        """, unsafe_allow_html=True)
 
         card = st.text_input("Номер карты", placeholder="0000 0000 0000 0000", max_chars=19)
         c1e, c2e = st.columns(2)
@@ -399,13 +708,27 @@ def page_billing():
         if txn_r and txn_r.status_code == 200:
             txns = txn_r.json()
             if txns:
-                rows = [{
-                    "Тип": t["type"],
-                    "Сумма": t["amount"],
-                    "Описание": t["description"],
-                    "Время": t["created_at"][:19].replace("T", " "),
-                } for t in txns]
-                st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+                TYPE_MAP = {"credit": ("Пополнение", "#059669", "#d1fae5"),
+                            "debit":  ("Списание",   "#dc2626", "#fee2e2"),
+                            "refund": ("Возврат",    "#2563eb", "#dbeafe")}
+                for t in txns[:20]:
+                    label, color, bg = TYPE_MAP.get(t["type"], (t["type"], "#6b7280", "#f3f4f6"))
+                    sign = "+" if t["type"] in ("credit","refund") else "-"
+                    st.markdown(f"""
+                    <div style="background:white;border-radius:10px;padding:12px 16px;
+                                margin-bottom:8px;border:1px solid #e5e7eb;
+                                display:flex;align-items:center;justify-content:space-between">
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <span style="background:{bg};color:{color};padding:3px 10px;
+                                         border-radius:20px;font-size:12px;font-weight:600">{label}</span>
+                            <span style="color:#6b7280;font-size:13px">{t['description']}</span>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end">
+                            <span style="color:{color};font-weight:700;font-size:15px">{sign}{t['amount']} кр.</span>
+                            <span style="color:#9ca3af;font-size:11px">{t['created_at'][:19].replace('T',' ')}</span>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
             else:
                 st.info("Нет транзакций")
 
