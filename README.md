@@ -103,12 +103,15 @@ docker compose exec postgres psql -U mluser -d mlservice -c "UPDATE users SET ro
 
 ## Тестовые аккаунты
 
+Admin создаётся **автоматически** при первом запуске:
+
 | Роль | Email | Пароль |
 |---|---|---|
-| `admin` | test2@test.com | secret123 |
-| `user` | brand_new@test.com | 123456 |
+| `admin` | admin@example.com | admin123 |
 
-> Если аккаунты не существуют — зарегистрируйтесь через Dashboard или `/auth/register`, затем назначьте роль admin через SQL-команду выше.
+Обычный пользователь — зарегистрируйся через Dashboard (http://localhost:8501).
+
+> Сменить email/пароль админа можно в `.env` через переменные `ADMIN_EMAIL` и `ADMIN_PASSWORD`.
 
 ## Пользовательский путь
 
