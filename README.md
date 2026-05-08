@@ -25,20 +25,12 @@ docker compose up -d
 > Первый запуск скачивает Docker-образы (~2-3 ГБ), занимает 3-5 минут.
 > Миграции БД и создание admin-аккаунта происходят **автоматически**.
 
-Открыть в браузере:
-
-| Сервис | URL |
-|---|---|
-| Dashboard | http://localhost:8501 |
-| Swagger API | http://localhost:8000/docs |
-| Grafana | http://localhost:3000 |
-
 ## Сервисы
 
 | Сервис | URL | Описание |
 |---|---|---|
+| Dashboard | http://localhost:8501 | Landing page / UI |
 | API (Swagger) | http://localhost:8000/docs | REST API документация |
-| Dashboard | http://localhost:8501 | Streamlit аналитика |
 | Grafana | http://localhost:3000 | Мониторинг метрик (admin/admin) |
 | Prometheus | http://localhost:9090 | Сбор метрик |
 
