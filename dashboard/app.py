@@ -7,8 +7,8 @@ import streamlit as st
 from sqlalchemy import create_engine, text
 
 API = os.getenv("API_URL", "http://api:8000")
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://mluser:mlpassword@postgres:5432/mlservice")
-engine = create_engine(DATABASE_URL)
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL) if DATABASE_URL else None
 
 st.set_page_config(page_title="ML Loan Service", layout="wide", initial_sidebar_state="expanded")
 
@@ -269,9 +269,16 @@ hr { border-color: #e5e7eb; }
 
 
 # ── helpers ──────────────────────────────────────────────
+_MODEL_NAMES = {
+    "loan model":   "Кредитный скоринг",
+    "loan_model":   "Кредитный скоринг",
+    "credit model": "Кредитный скоринг",
+    "model v1":     "Кредитный скоринг v1",
+    "model v2":     "Кредитный скоринг v2",
+}
+
 def fmt_model(name: str) -> str:
-    """Make model file names human-readable."""
-    return name.replace("_", " ").replace("-", " ").title()
+    return _MODEL_NAMES.get(name.lower(), name.replace("_", " ").replace("-", " ").title())
 
 
 def api(method, path, token=None, **kwargs):
@@ -285,6 +292,8 @@ def api(method, path, token=None, **kwargs):
 
 
 def db(query):
+    if not engine:
+        return pd.DataFrame()
     try:
         with engine.connect() as conn:
             return pd.read_sql(text(query), conn)
@@ -621,43 +630,76 @@ def page_prediction():
         selected = st.selectbox("Модель скоринга", list(model_options.keys()))
         model_id = model_options[selected]
 
+        GENDER_MAP  = {"Мужской": "male", "Женский": "female"}
+        EDU_MAP     = {"Среднее": "High School", "Неполное высшее": "Associate",
+                       "Бакалавр": "Bachelor", "Магистр": "Master", "Докторантура": "Doctorate"}
+        HOME_MAP    = {"Аренда": "RENT", "Собственное": "OWN",
+                       "Ипотека": "MORTGAGE", "Другое": "OTHER"}
+        INTENT_MAP  = {"Личные нужды": "PERSONAL", "Образование": "EDUCATION",
+                       "Медицина": "MEDICAL", "Бизнес": "VENTURE",
+                       "Ремонт": "HOMEIMPROVEMENT", "Рефинансирование": "DEBTCONSOLIDATION"}
+        DEFAULT_MAP = {"Нет": "No", "Да": "Yes"}
+
         st.markdown("**Данные заёмщика**")
+        st.caption("Поля со * обязательны. Остальные можно оставить по умолчанию.")
         c1, c2 = st.columns(2)
         with c1:
-            age     = st.number_input("Возраст", 18, 100, 30)
-            gender  = st.selectbox("Пол", ["male", "female"])
-            edu     = st.selectbox("Образование", ["High School", "Associate", "Bachelor", "Master", "Doctorate"])
-            income  = st.number_input("Доход в год ($)", 0, 10_000_000, 60000, step=1000)
-            emp_exp = st.number_input("Опыт работы (лет)", 0, 50, 5)
-            home    = st.selectbox("Жильё", ["RENT", "OWN", "MORTGAGE", "OTHER"])
+            age = st.number_input(
+                "Возраст *", 18, 100, 30,
+                help="Полных лет заёмщика")
+            gender_ru = st.selectbox(
+                "Пол *", list(GENDER_MAP),
+                help="Биологический пол заёмщика")
+            edu_ru = st.selectbox(
+                "Образование *", list(EDU_MAP),
+                help="Наивысший полученный уровень образования")
+            income = st.number_input(
+                "Доход в год ($) *", 0, 10_000_000, 60000, step=1000,
+                help="Годовой доход до вычета налогов")
+            emp_exp = st.number_input(
+                "Опыт работы (лет)", 0, 50, 0,
+                help="Необязательно. Если неизвестно — оставьте 0")
+            home_ru = st.selectbox(
+                "Жильё", list(HOME_MAP),
+                help="Необязательно. Тип проживания. По умолчанию — Аренда")
         with c2:
-            loan_amnt    = st.number_input("Сумма займа ($)", 0, 1_000_000, 10000, step=500)
-            loan_intent  = st.selectbox("Цель займа", ["PERSONAL", "EDUCATION", "MEDICAL", "VENTURE", "HOMEIMPROVEMENT", "DEBTCONSOLIDATION"])
-            loan_rate    = st.number_input("Процентная ставка (%)", 0.0, 50.0, 10.5)
-            cred_hist    = st.number_input("История кредитов (лет)", 0, 50, 3)
-            credit_score = st.number_input("Кредитный рейтинг", 300, 850, 650)
-            prev_default = st.selectbox("Прошлые дефолты", ["No", "Yes"])
+            loan_amnt = st.number_input(
+                "Сумма займа ($) *", 0, 1_000_000, 10000, step=500,
+                help="Запрашиваемая сумма кредита")
+            intent_ru = st.selectbox(
+                "Цель займа *", list(INTENT_MAP),
+                help="На что будут потрачены средства")
+            loan_rate = st.number_input(
+                "Процентная ставка (%)", 0.0, 50.0, 10.5,
+                help="Необязательно. Предлагаемая банком ставка. По умолчанию — 10.5%")
+            cred_hist = st.number_input(
+                "История кредитов (лет)", 0, 50, 0,
+                help="Необязательно. Сколько лет назад открыт первый кредит. Если нет — оставьте 0")
+            credit_score = st.number_input(
+                "Кредитный рейтинг", 300, 850, 600,
+                help="Необязательно. Если неизвестен — оставьте 600 (средний)")
+            default_ru = st.selectbox(
+                "Были ли дефолты?", list(DEFAULT_MAP),
+                help="Необязательно. Были ли просрочки по прошлым кредитам")
 
-        # авто-расчёт доли займа от дохода
+        # авто-расчёт доли займа от дохода (не показываем пользователю)
         loan_pct_inc = round(loan_amnt / income, 4) if income > 0 else 0.0
-        st.markdown(f"""
-        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;
-                    padding:10px 14px;margin:4px 0 12px;font-size:13px;color:#0369a1">
-            Доля займа от дохода: <strong>{loan_pct_inc:.2%}</strong>
-            &nbsp;(рассчитано автоматически: {loan_amnt:,}$ / {income:,}$)
-        </div>
-        """, unsafe_allow_html=True)
 
         if st.button("Отправить на оценку", use_container_width=True, type="primary"):
             payload = {
-                "person_age": age, "person_gender": gender,
-                "person_education": edu, "person_income": income,
-                "person_emp_exp": emp_exp, "person_home_ownership": home,
-                "loan_amnt": loan_amnt, "loan_intent": loan_intent,
-                "loan_int_rate": loan_rate, "loan_percent_income": loan_pct_inc,
+                "person_age": age,
+                "person_gender": GENDER_MAP[gender_ru],
+                "person_education": EDU_MAP[edu_ru],
+                "person_income": income,
+                "person_emp_exp": emp_exp,
+                "person_home_ownership": HOME_MAP[home_ru],
+                "loan_amnt": loan_amnt,
+                "loan_intent": INTENT_MAP[intent_ru],
+                "loan_int_rate": loan_rate,
+                "loan_percent_income": loan_pct_inc,
                 "cb_person_cred_hist_length": cred_hist,
                 "credit_score": credit_score,
-                "previous_loan_defaults_on_file": prev_default,
+                "previous_loan_defaults_on_file": DEFAULT_MAP[default_ru],
             }
             r = api("post", f"/predictions/?model_id={model_id}", token=token, json=payload)
             if r and r.status_code == 202:
@@ -740,13 +782,18 @@ def page_my_predictions():
 
     st.divider()
 
+    STATUS_RU = {"done": "Выполнено", "failed": "Ошибка",
+                 "pending": "В очереди", "running": "Обрабатывается"}
+    DECISION_RU = {"Approved": "Одобрено", "Rejected": "Отказано"}
+
     rows = []
     for t in data:
         res = t.get("result") or {}
+        label = res.get("label", "—")
         rows.append({
             "ID": t["id"],
-            "Статус": t["status"],
-            "Решение": res.get("label", "—"),
+            "Статус": STATUS_RU.get(t["status"], t["status"]),
+            "Решение": DECISION_RU.get(label, label),
             "Вероятность": f"{float(res['probability'])*100:.1f}%" if res.get("probability") else "—",
             "Кредитов": t["credits_cost"],
             "Время": t["created_at"][:19].replace("T", " "),

@@ -10,7 +10,13 @@ from app.schemas.user import Token, UserOut, UserRegister
 router = APIRouter()
 
 
-@router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=UserOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="Регистрация нового пользователя",
+    description="Создаёт аккаунт и зачисляет **100 стартовых кредитов**. Email должен быть уникальным.",
+)
 def register(data: UserRegister, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == data.email).first()
     if existing:
@@ -26,7 +32,12 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/login", response_model=Token)
+@router.post(
+    "/login",
+    response_model=Token,
+    summary="Вход в систему",
+    description="Возвращает JWT Bearer токен. Используйте его в заголовке `Authorization: Bearer <token>` для всех защищённых эндпоинтов.",
+)
 def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form.username).first()
     if not user or not verify_password(form.password, user.password_hash):

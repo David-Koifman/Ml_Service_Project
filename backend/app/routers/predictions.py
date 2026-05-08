@@ -13,7 +13,19 @@ from app.config import settings
 router = APIRouter()
 
 
-@router.post("/", response_model=PredictionTaskOut, status_code=202)
+@router.post(
+    "/",
+    response_model=PredictionTaskOut,
+    status_code=202,
+    summary="Создать задачу предсказания",
+    description="""
+Отправляет данные заёмщика на ML-модель. Обработка **асинхронная** (Celery).
+
+- Возвращает задачу со статусом `pending`
+- Стоимость: **10 кредитов** (списываются только при успешном выполнении)
+- Проверяйте результат через `GET /predictions/{id}`
+    """,
+)
 def create_prediction(
     model_id: int,
     data: PredictionRequest,
@@ -43,7 +55,7 @@ def create_prediction(
     return task
 
 
-@router.get("/", response_model=list[PredictionTaskOut])
+@router.get("/", response_model=list[PredictionTaskOut], summary="История предсказаний", description="Последние 50 запросов текущего пользователя.")
 def list_predictions(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -53,7 +65,7 @@ def list_predictions(
     ).order_by(PredictionTask.created_at.desc()).limit(50).all()
 
 
-@router.get("/{task_id}", response_model=PredictionTaskOut)
+@router.get("/{task_id}", response_model=PredictionTaskOut, summary="Статус и результат предсказания", description="Статусы: `pending` → `running` → `done` / `failed`. Результат доступен при статусе `done`.")
 def get_prediction(
     task_id: int,
     db: Session = Depends(get_db),
