@@ -36,7 +36,8 @@
       "Bash(python3:*)",
       "Bash(DATABASE_URL=sqlite:///./test.db REDIS_URL=redis://localhost:6379/0 SECRET_KEY=testsecret pytest tests/ -v)",
       "Bash(DATABASE_URL=sqlite:///./test.db REDIS_URL=redis://localhost:6379/0 SECRET_KEY=testsecret pytest tests/ -v --tb=short 2>&1)",
-      "Bash(DATABASE_URL=sqlite:///./test.db REDIS_URL=redis://localhost:6379/0 SECRET_KEY=testsecret pytest tests/ -v --tb=short)"
+      "Bash(DATABASE_URL=sqlite:///./test.db REDIS_URL=redis://localhost:6379/0 SECRET_KEY=testsecret pytest tests/ -v --tb=short)",
+      "Bash(DATABASE_URL=sqlite:///./test.db REDIS_URL=redis://localhost:6379/0 SECRET_KEY=testsecret pytest tests/ -v --cov=app --cov-report=term-missing)"
     ]
   }
 }
