@@ -25,12 +25,13 @@ docker compose up -d
 > Первый запуск скачивает Docker-образы (~2-3 ГБ), занимает 3-5 минут.
 > Миграции БД и создание admin-аккаунта происходят **автоматически**.
 
-```bash
-# 4. Открыть в браузере
-open http://localhost:8501        # Landing page / Dashboard
-open http://localhost:8000/docs   # Swagger API документация
-open http://localhost:3000        # Grafana (admin/admin)
-```
+Открыть в браузере:
+
+| Сервис | URL |
+|---|---|
+| Dashboard | http://localhost:8501 |
+| Swagger API | http://localhost:8000/docs |
+| Grafana | http://localhost:3000 |
 
 ## Сервисы
 
@@ -181,7 +182,7 @@ curl -X POST http://localhost:8000/models/upload \
 
 ```bash
 cd backend
-pytest tests/ -v --cov=app --cov-report=term-missing
+DATABASE_URL=sqlite:///./test.db REDIS_URL=redis://localhost:6379/0 SECRET_KEY=testsecret pytest tests/ -v --cov=app --cov-report=term-missing
 ```
 
 Покрытие: **92%**
