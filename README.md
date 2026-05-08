@@ -4,6 +4,10 @@
 
 > Точность модели: **93%** (GradientBoostingClassifier) · Покрытие тестами: **92%**
 
+## Требования
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (единственная зависимость)
+
 ## Быстрый старт
 
 ```bash
@@ -14,10 +18,15 @@ cd MLServiceProject
 # 2. Создать .env файл
 cp .env.example .env
 
-# 3. Запустить все сервисы (миграции применяются автоматически)
+# 3. Запустить все сервисы
 docker compose up -d
+```
 
-# 4. Готово!
+> Первый запуск скачивает Docker-образы (~2-3 ГБ), занимает 3-5 минут.
+> Миграции БД и создание admin-аккаунта происходят **автоматически**.
+
+```bash
+# 4. Открыть в браузере
 open http://localhost:8501        # Landing page / Dashboard
 open http://localhost:8000/docs   # Swagger API документация
 open http://localhost:3000        # Grafana (admin/admin)
@@ -187,3 +196,5 @@ pytest tests/ -v --cov=app --cov-report=term-missing
 | `PREDICTION_COST` | Стоимость предсказания в кредитах (default: 10) |
 | `INITIAL_CREDITS` | Начальный баланс при регистрации (default: 100) |
 | `GRAFANA_PASSWORD` | Пароль Grafana (default: admin) |
+| `ADMIN_EMAIL` | Email admin-аккаунта (default: admin@example.com) |
+| `ADMIN_PASSWORD` | Пароль admin-аккаунта (default: admin123) |
