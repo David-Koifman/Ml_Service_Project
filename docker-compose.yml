@@ -36,7 +36,7 @@ services:
       PROMETHEUS_MULTIPROC_DIR: /tmp/prometheus_multiproc
     volumes:
       - ./backend:/app
-      - model_storage:/app/ml_models
+      - ./backend/ml_models:/app/ml_models
       - prometheus_multiproc:/tmp/prometheus_multiproc
     ports:
       - "8000:8000"
@@ -56,7 +56,7 @@ services:
       PROMETHEUS_MULTIPROC_DIR: /tmp/prometheus_multiproc
     volumes:
       - ./backend:/app
-      - model_storage:/app/ml_models
+      - ./backend/ml_models:/app/ml_models
       - prometheus_multiproc:/tmp/prometheus_multiproc
     depends_on:
       postgres:
@@ -101,5 +101,4 @@ services:
 volumes:
   postgres_data:
   grafana_data:
-  model_storage:
   prometheus_multiproc:
