@@ -84,7 +84,7 @@ Client → FastAPI → PostgreSQL
 
 1. При регистрации пользователь получает **100 кредитов**
 2. Каждое успешное предсказание стоит **10 кредитов**
-3. Списание происходит **атомарно** (SELECT FOR UPDATE) только при успешном выполнении
+3. Списание происходит **атомарно** (единая транзакция) только при успешном выполнении
 4. Если worker упал — кредиты **не списываются**
 5. Пополнение через `POST /billing/topup` (mock платёжного шлюза)
 6. Промокоды дают бонусные кредиты (создаёт admin)
@@ -100,6 +100,15 @@ Client → FastAPI → PostgreSQL
 ```bash
 docker compose exec postgres psql -U mluser -d mlservice -c "UPDATE users SET role='admin' WHERE email='your@email.com';"
 ```
+
+## Тестовые аккаунты
+
+| Роль | Email | Пароль |
+|---|---|---|
+| `admin` | test2@test.com | secret123 |
+| `user` | brand_new@test.com | 123456 |
+
+> Если аккаунты не существуют — зарегистрируйтесь через Dashboard или `/auth/register`, затем назначьте роль admin через SQL-команду выше.
 
 ## Пользовательский путь
 
@@ -132,7 +141,7 @@ python ml/train_model.py
 # Загрузить через API (после запуска)
 curl -X POST http://localhost:8000/models/upload \
   -H "Authorization: Bearer <token>" \
-  -F "name=Loan Model" \
+  -F "name=Кредитный скоринг v1" \
   -F "file=@backend/ml_models/loan_model.joblib"
 ```
 
