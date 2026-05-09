@@ -4,6 +4,24 @@
 
 > Точность модели: **93%** (GradientBoostingClassifier) · Покрытие тестами: **92%**
 
+## Деплой (Railway)
+
+> Потенциальный вариант для демо без локального запуска — [Railway.app](https://railway.app) (бесплатные $5 кредитов на 30 дней).
+
+Архитектура деплоя: 5 отдельных сервисов — API, Worker (Celery), Dashboard, Postgres, Redis.
+
+| Сервис | Root Directory | Start Command |
+|---|---|---|
+| API | `backend` | Dockerfile CMD |
+| Worker | `backend` | `mkdir -p /tmp/prometheus_multiproc && celery -A app.worker.celery_app worker --loglevel=info` |
+| Dashboard | `dashboard` | Dockerfile CMD |
+| Postgres | — | Railway managed |
+| Redis | — | Railway managed |
+
+Переменные окружения для API и Worker: `DATABASE_URL`, `REDIS_URL`, `SECRET_KEY`, `PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_multiproc`
+
+Переменная для Dashboard: `API_URL=https://<api-domain>`
+
 ## Требования
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (единственная зависимость)
