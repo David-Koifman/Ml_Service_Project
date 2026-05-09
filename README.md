@@ -13,7 +13,7 @@
 ```bash
 # 1. Клонировать и перейти в папку
 git clone <repo>
-cd MLServiceProject
+cd Ml_Service_Project
 
 # 2. Создать .env файл
 cp .env.example .env
