@@ -41,10 +41,11 @@ def run_prediction(self, task_id: int, model_path: str, input_data: dict):
         probability = float(pipeline.predict_proba(df)[0][prediction])
         prediction_duration_seconds.observe(time.time() - start)
 
+        approved = prediction == 0  # 0 = no default = approved, 1 = default = rejected
         result = {
-            "approved": bool(prediction),
+            "approved": approved,
             "probability": round(probability, 4),
-            "label": "Approved" if prediction == 1 else "Rejected",
+            "label": "Approved" if approved else "Rejected",
         }
 
         # атомарно списываем кредиты и сохраняем результат
