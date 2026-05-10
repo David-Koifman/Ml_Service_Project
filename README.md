@@ -218,6 +218,30 @@ DATABASE_URL=sqlite:///./test.db REDIS_URL=redis://localhost:6379/0 SECRET_KEY=t
 | `ADMIN_EMAIL` | Email admin-аккаунта (default: admin@example.com) |
 | `ADMIN_PASSWORD` | Пароль admin-аккаунта (default: admin123) |
 
+## Использование ИИ-инструментов
+
+В разработке проекта использовался **Claude Code** (Anthropic) в качестве AI-ассистента.
+
+### Что делалось с помощью ИИ
+- Генерация шаблонного кода (роуты, схемы, модели SQLAlchemy)
+- Написание unit-тестов и фикстур pytest
+- Отладка ошибок (CRLF в shell-скриптах, Prometheus multiprocess mode, Railway деплой)
+- Анализ кода на баги (race condition, security issues, бизнес-логика)
+- Написание Docker Compose конфигурации
+
+### Что делалось самостоятельно
+- Архитектурные решения (стек, структура сервисов, биллинговая модель)
+- Обучение ML-модели (`ml/train_model.py`)
+- UX и дизайн Streamlit Dashboard
+- Постановка задач и code review результатов ИИ
+- Деплой и настройка Railway
+
+### Инструменты
+| Инструмент | Назначение |
+|---|---|
+| Claude Code (Anthropic) | Написание и отладка кода |
+| scikit-learn | Обучение GradientBoostingClassifier |
+
 ## Деплой на Railway (опционально)
 
 > Потенциальный вариант для демонстрации онлайн без локального запуска. Основной способ — Docker Compose выше. Railway даёт $5 бесплатных кредитов на 30 дней.
