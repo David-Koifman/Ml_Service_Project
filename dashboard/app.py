@@ -425,6 +425,9 @@ def page_auth():
 
     col = st.columns([1, 1.2, 1])[1]
     with col:
+        if st.session_state.get("reg_success"):
+            st.success("Аккаунт создан! Войдите со своими данными.")
+            st.session_state.pop("reg_success", None)
         if st.button("← На главную"):
             st.session_state.pop("show_auth", None)
             st.session_state.pop("auth_tab", None)
@@ -475,7 +478,7 @@ def page_auth():
                     st.error("Неверный email или пароль")
         else:
             r_email = st.text_input("Email", key="reg_email")
-            r_pwd   = st.text_input("Пароль (мин. 6 символов)", type="password", key="reg_pwd")
+            r_pwd   = st.text_input("Пароль (мин. 6 символов)", type="password", key="reg_pwd", placeholder="Введите пароль вручную")
             if st.button("Зарегистрироваться", use_container_width=True, type="primary", key="do_reg"):
                 if not r_email or not r_pwd:
                     st.error("Заполните все поля")
@@ -484,8 +487,9 @@ def page_auth():
                 else:
                     r = api("post", "/auth/register", json={"email": r_email, "password": r_pwd})
                     if r and r.status_code == 201:
-                        st.success("Аккаунт создан! Нажмите «Войти»")
+                        st.session_state.reg_success = True
                         st.session_state.auth_tab = "login"
+                        st.rerun()
                     elif r:
                         detail = r.json().get("detail", "Ошибка")
                         if "already" in str(detail):
