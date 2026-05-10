@@ -4,26 +4,6 @@
 
 > Точность модели: **93%** (GradientBoostingClassifier) · Покрытие тестами: **92%**
 
-## Деплой (Railway) — опционально
-
-> **Примечание:** Это потенциальный вариант деплоя для демонстрации без локального запуска. Основной способ запуска — через Docker Compose (см. ниже). Railway предоставляет бесплатные $5 кредитов на 30 дней.
-
-> Конфигурация Railway проверена частично — основной и рекомендуемый способ запуска проекта описан в разделе «Быстрый старт».
-
-Архитектура деплоя: 5 отдельных сервисов — API, Worker (Celery), Dashboard, Postgres, Redis.
-
-| Сервис | Root Directory | Start Command |
-|---|---|---|
-| API | `backend` | Dockerfile CMD |
-| Worker | `backend` | `mkdir -p /tmp/prometheus_multiproc && celery -A app.worker.celery_app worker --loglevel=info` |
-| Dashboard | `dashboard` | Dockerfile CMD |
-| Postgres | — | Railway managed |
-| Redis | — | Railway managed |
-
-Переменные окружения для API и Worker: `DATABASE_URL`, `REDIS_URL`, `SECRET_KEY`, `PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_multiproc`
-
-Переменная для Dashboard: `API_URL=https://<api-domain>`
-
 ## Требования
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (единственная зависимость)
@@ -237,3 +217,21 @@ DATABASE_URL=sqlite:///./test.db REDIS_URL=redis://localhost:6379/0 SECRET_KEY=t
 | `GRAFANA_PASSWORD` | Пароль Grafana (default: admin) |
 | `ADMIN_EMAIL` | Email admin-аккаунта (default: admin@example.com) |
 | `ADMIN_PASSWORD` | Пароль admin-аккаунта (default: admin123) |
+
+## Деплой на Railway (опционально)
+
+> Потенциальный вариант для демонстрации онлайн без локального запуска. Основной способ — Docker Compose выше. Railway даёт $5 бесплатных кредитов на 30 дней.
+
+Архитектура: 5 сервисов — API, Worker, Dashboard, Postgres, Redis.
+
+| Сервис | Root Directory | Start Command |
+|---|---|---|
+| API | `backend` | Dockerfile CMD |
+| Worker | `backend` | `mkdir -p /tmp/prometheus_multiproc && celery -A app.worker.celery_app worker --loglevel=info` |
+| Dashboard | `dashboard` | Dockerfile CMD |
+| Postgres | — | Railway managed |
+| Redis | — | Railway managed |
+
+Переменные для API и Worker: `DATABASE_URL`, `REDIS_URL`, `SECRET_KEY`, `PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_multiproc`
+
+Переменная для Dashboard: `API_URL=https://<api-domain>`
